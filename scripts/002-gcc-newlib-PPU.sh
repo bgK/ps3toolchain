@@ -17,6 +17,7 @@ if [ ! -d ${GCC} ]; then
   ## Patch the source code.
   cat ../patches/${GCC}-PS3.patch | patch -p1 -d ${GCC}
   cat ../patches/${NEWLIB}-PS3.patch | patch -p1 -d ${NEWLIB}
+  cat ../patches/${NEWLIB}-fseek.patch | patch -p1 -d ${NEWLIB}
 
   ## Enter the source code directory.
   cd ${GCC}

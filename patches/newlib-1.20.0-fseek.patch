@@ -1,0 +1,82 @@
+diff -ur newlib-1.20.0/newlib/libc/stdio/fseek.c newlib-1.20.0-patched/newlib/libc/stdio/fseek.c
+--- newlib-1.20.0/newlib/libc/stdio/fseek.c	2011-01-28 11:49:11.000000000 +0100
++++ newlib-1.20.0-patched/newlib/libc/stdio/fseek.c	2019-11-18 19:22:35.214233248 +0100
+@@ -166,31 +166,12 @@
+   switch (whence)
+     {
+     case SEEK_CUR:
+-      /*
+-       * In order to seek relative to the current stream offset,
+-       * we have to first find the current stream offset a la
+-       * ftell (see ftell for details).
+-       */
+-      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
+-      if (fp->_flags & __SOFF)
+-	curoff = fp->_offset;
+-      else
+-	{
+-	  curoff = seekfn (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+-	  if (curoff == -1L)
+-	    {
+-	      _funlockfile (fp);
+-	      return EOF;
+-	    }
+-	}
+-      if (fp->_flags & __SRD)
+-	{
+-	  curoff -= fp->_r;
+-	  if (HASUB (fp))
+-	    curoff -= fp->_ur;
+-	}
+-      else if (fp->_flags & __SWR && fp->_p != NULL)
+-	curoff += fp->_p - fp->_bf._base;
++      curoff = _ftell_r(ptr, fp);
++      if (curoff == -1L)
++        {
++          _funlockfile (fp);
++          return EOF;
++        }
+ 
+       offset += curoff;
+       whence = SEEK_SET;
+diff -ur newlib-1.20.0/newlib/libc/stdio64/fseeko64.c newlib-1.20.0-patched/newlib/libc/stdio64/fseeko64.c
+--- newlib-1.20.0/newlib/libc/stdio64/fseeko64.c	2009-12-17 20:43:43.000000000 +0100
++++ newlib-1.20.0-patched/newlib/libc/stdio64/fseeko64.c	2019-11-18 19:24:38.155700263 +0100
+@@ -156,31 +156,12 @@
+   switch (whence)
+     {
+     case SEEK_CUR:
+-      /*
+-       * In order to seek relative to the current stream offset,
+-       * we have to first find the current stream offset a la
+-       * ftell (see ftell for details).
+-       */
+-      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
+-      if (fp->_flags & __SOFF)
+-	curoff = fp->_offset;
+-      else
+-	{
+-	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
+-	  if (curoff == -1L)
+-	    {
+-	      _funlockfile(fp);
+-	      return EOF;
+-	    }
+-	}
+-      if (fp->_flags & __SRD)
+-	{
+-	  curoff -= fp->_r;
+-	  if (HASUB (fp))
+-	    curoff -= fp->_ur;
+-	}
+-      else if (fp->_flags & __SWR && fp->_p != NULL)
+-	curoff += fp->_p - fp->_bf._base;
++      curoff = _ftello64_r(ptr, fp);
++      if (curoff == -1L)
++        {
++	  _funlockfile(fp);
++          return EOF;
++        }
+ 
+       offset += curoff;
+       whence = SEEK_SET;
